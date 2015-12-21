@@ -4,6 +4,7 @@ DATABASE_HOST=${DATABASE_HOST:-}
 DATABASE_NAME=${DATABASE_NAME:-}
 DATABASE_USER=${DATABASE_USER:-}
 DATABASE_PASSWORD=${DATABASE_PASSWORD:-}
+MYSQLDUMP_BINARY=${MYSQLDUMP_BINARY:mysqldump}
 SSH_HOST=${SSH_HOST:-}
 SSH_USER=${SSH_USER:-}
 
@@ -26,7 +27,7 @@ if [ ! -f /root/.ssh/id_rsa ]; then
 fi
 
 ssh ${SSH_USER}@${SSH_HOST} \
-    "mysqldump -u${DATABASE_USER} -h${DATABASE_HOST} ${DATABASE_NAME} -p${DATABASE_PASSWORD} \
+    "${MYSQLDUMP_BINARY} -u${DATABASE_USER} -h${DATABASE_HOST} ${DATABASE_NAME} -p${DATABASE_PASSWORD} \
         --skip-opt \
         --add-drop-table \
         --add-locks \
