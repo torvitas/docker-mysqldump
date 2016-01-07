@@ -27,7 +27,7 @@ if [ ! -f /root/.ssh/id_rsa ]; then
 fi
 
 ssh ${SSH_USER}@${SSH_HOST} \
-    "${MYSQLDUMP_BINARY} -u${DATABASE_USER} -h${DATABASE_HOST} ${DATABASE_NAME} -p${DATABASE_PASSWORD} \
+    "${MYSQLDUMP_BINARY} -u${DATABASE_USER} -h${DATABASE_HOST} ${DATABASE_NAME} -p'${DATABASE_PASSWORD}' \
         --skip-opt \
         --add-drop-table \
         --add-locks \
