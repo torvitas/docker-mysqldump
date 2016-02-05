@@ -35,6 +35,9 @@ ssh ${SSH_USER}@${SSH_HOST} \
         --disable-keys \
         --extended-insert \
         --default-character-set=utf8 \
-        --set-charset | gzip -9" > /var/dumps/dump.$(date +%s).${DATABASE_NAME}.sql.gz
+        --set-charset \
+        | sed '/^\/\*\!50013/d' \
+        | sed 's/\/\*\!50017.*\*\///' \
+        | gzip -9" > /var/dumps/dump.$(date +%s).${DATABASE_NAME}.sql.gz
 chown 1000 /var/dumps/dump.*
 exec "$@"
