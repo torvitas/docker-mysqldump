@@ -20,11 +20,12 @@ if [[ -z ${SSH_USER} ]] || [[ -z ${SSH_HOST} ]]; then
 fi
 if [ ! -f /root/.ssh/id_rsa ]; then
   mkdir -p /root/.ssh
-  chmod 600 -R /root/.ssh
   ssh-keygen -b 2048 -t rsa -f /root/.ssh/id_rsa -q -N ""
-  ssh-keyscan -H live.spectra.de >> /root/.ssh/known_hosts
+  ssh-keyscan -H ${SSH_HOST} >> /root/.ssh/known_hosts
   ssh-copy-id ${SSH_USER}@${SSH_HOST}
 fi
+
+chmod 600 -R /root/.ssh
 
 ssh ${SSH_USER}@${SSH_HOST} \
     "${MYSQLDUMP_BINARY} -u${DATABASE_USER} -h${DATABASE_HOST} ${DATABASE_NAME} -p'${DATABASE_PASSWORD}' \
