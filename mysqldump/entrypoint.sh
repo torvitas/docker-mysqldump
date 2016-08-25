@@ -37,8 +37,9 @@ if [ ! -f /home/${LOCAL_USER}/.ssh/id_rsa ]; then
 fi
 
 chmod 600 -R /home/${LOCAL_USER}/.ssh
+chown ${LOCAL_USER}.${LOCAL_USER} -R /home/${LOCAL_USER}/.ssh
 
-ssh ${SSH_USER}@${SSH_HOST} \
+HOME="/home/${WEB_USER}" sudo -u ${WEB_USER} -E -- ssh ${SSH_USER}@${SSH_HOST} \
     "${MYSQLDUMP_BINARY} -u${DATABASE_USER} -h${DATABASE_HOST} ${DATABASE_NAME} -p'${DATABASE_PASSWORD}' \
         --skip-opt \
         --add-drop-table \
@@ -49,5 +50,5 @@ ssh ${SSH_USER}@${SSH_HOST} \
         --default-character-set=utf8 \
         --set-charset \
         | gzip -9" > /var/dumps/dump.$(date +%s).${DATABASE_NAME}.sql.gz
-chown 1000 /var/dumps/dump.*
+chown ${LOCAL_USER} /var/dumps/dump.*
 exec "$@"
