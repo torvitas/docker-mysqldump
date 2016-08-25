@@ -2,7 +2,7 @@ FROM centos:7
 MAINTAINER Sascha Marcel Schmidt <docker@saschaschmidt.net>
 
 RUN yum update -y && \
-    yum install openssh-clients mariadb -y && \
+    yum install openssh-clients mariadb sudo -y && \
     yum clean all
 
 COPY entrypoint.sh /usr/local/bin/entrypoint
