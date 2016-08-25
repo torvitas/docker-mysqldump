@@ -11,9 +11,10 @@ SSH_USER=${SSH_USER:-root}
 LOCAL_USER_UID=${LOCAL_USER_UID:-0}
 LOCAL_USER=${LOCAL_USER:-root}
 if [ "${LOCAL_USER}" != "root" ]; then
-    useradd ${LOCAL_USER} -mu ${LOCAL_USER_UID}  > /dev/null 2>&1
+    echo "Creating user ${LOCAL_USER} with uid ${LOCAL_USER_UID}... "
+    useradd ${LOCAL_USER} -mu ${LOCAL_USER_UID}
     chown -R ${LOCAL_USER}.${LOCAL_USER} /home/${LOCAL_USER}
-    gpasswd -a ${LOCAL_USER} superuser
+    echo "done"
 else
     ln -s /root /home/root
 fi
@@ -39,7 +40,7 @@ fi
 chmod 600 -R /home/${LOCAL_USER}/.ssh
 chown ${LOCAL_USER}.${LOCAL_USER} -R /home/${LOCAL_USER}/.ssh
 
-HOME="/home/${WEB_USER}" sudo -u ${WEB_USER} -E -- ssh ${SSH_USER}@${SSH_HOST} \
+HOME="/home/${LOCAL_USER}" sudo -u ${LOCAL_USER} -E -- ssh ${SSH_USER}@${SSH_HOST} \
     "${MYSQLDUMP_BINARY} -u${DATABASE_USER} -h${DATABASE_HOST} ${DATABASE_NAME} -p'${DATABASE_PASSWORD}' \
         --skip-opt \
         --add-drop-table \
