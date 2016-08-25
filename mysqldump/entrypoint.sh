@@ -14,6 +14,8 @@ if [ "${LOCAL_USER}" != "root" ]; then
     useradd ${LOCAL_USER} -mu ${LOCAL_USER_UID}  > /dev/null 2>&1
     chown -R ${LOCAL_USER}.${LOCAL_USER} /home/${LOCAL_USER}
     gpasswd -a ${LOCAL_USER} superuser
+else
+    ln -s /root /home/root
 fi
 
 if [[ -z ${DATABASE_HOST} ]] || [[ -z ${DATABASE_NAME} ]] || [[ -z ${DATABASE_USER} ]] || [[ -z ${DATABASE_PASSWORD} ]]; then
@@ -26,15 +28,15 @@ if [[ -z ${SSH_USER} ]] || [[ -z ${SSH_HOST} ]]; then
   echo "  Please configure the ssh connection."
   exit 1
 fi
-if [ ! -f /${LOCAL_USER}/.ssh/id_rsa ]; then
-  mkdir -p /${LOCAL_USER}/.ssh
-  chmod 600 -R /${LOCAL_USER}/.ssh
-  ssh-keygen -b 2048 -t rsa -f /${LOCAL_USER}/.ssh/id_rsa -q -N ""
-  ssh-keyscan -H ${SSH_HOST} >> /${LOCAL_USER}/.ssh/known_hosts
+if [ ! -f /home/${LOCAL_USER}/.ssh/id_rsa ]; then
+  mkdir -p /home/${LOCAL_USER}/.ssh
+  chmod 600 -R /home/${LOCAL_USER}/.ssh
+  ssh-keygen -b 2048 -t rsa -f /home/${LOCAL_USER}/.ssh/id_rsa -q -N ""
+  ssh-keyscan -H ${SSH_HOST} >> /home/${LOCAL_USER}/.ssh/known_hosts
   ssh-copy-id ${SSH_USER}@${SSH_HOST}
 fi
 
-chmod 600 -R /${LOCAL_USER}/.ssh
+chmod 600 -R /home/${LOCAL_USER}/.ssh
 
 ssh ${SSH_USER}@${SSH_HOST} \
     "${MYSQLDUMP_BINARY} -u${DATABASE_USER} -h${DATABASE_HOST} ${DATABASE_NAME} -p'${DATABASE_PASSWORD}' \
