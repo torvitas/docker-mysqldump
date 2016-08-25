@@ -6,7 +6,8 @@ DATABASE_USER=${DATABASE_USER:-}
 DATABASE_PASSWORD=${DATABASE_PASSWORD:-}
 MYSQLDUMP_BINARY=${MYSQLDUMP_BINARY:-mysqldump}
 SSH_HOST=${SSH_HOST:-}
-SSH_USER=${SSH_USER:-}
+SSH_USER=${SSH_USER:-root}
+LOCAL_USER=${LOCAL_USER:-root}
 
 if [[ -z ${DATABASE_HOST} ]] || [[ -z ${DATABASE_NAME} ]] || [[ -z ${DATABASE_USER} ]] || [[ -z ${DATABASE_PASSWORD} ]]; then
   echo "ERROR: "
@@ -18,14 +19,15 @@ if [[ -z ${SSH_USER} ]] || [[ -z ${SSH_HOST} ]]; then
   echo "  Please configure the ssh connection."
   exit 1
 fi
-if [ ! -f /root/.ssh/id_rsa ]; then
-  mkdir -p /root/.ssh
-  ssh-keygen -b 2048 -t rsa -f /root/.ssh/id_rsa -q -N ""
-  ssh-keyscan -H ${SSH_HOST} >> /root/.ssh/known_hosts
+if [ ! -f /${LOCAL_USER}/.ssh/id_rsa ]; then
+  mkdir -p /${LOCAL_USER}/.ssh
+  chmod 600 -R /${LOCAL_USER}/.ssh
+  ssh-keygen -b 2048 -t rsa -f /${LOCAL_USER}/.ssh/id_rsa -q -N ""
+  ssh-keyscan -H ${SSH_HOST} >> /${LOCAL_USER}/.ssh/known_hosts
   ssh-copy-id ${SSH_USER}@${SSH_HOST}
 fi
 
-chmod 600 -R /root/.ssh
+chmod 600 -R /${LOCAL_USER}/.ssh
 
 ssh ${SSH_USER}@${SSH_HOST} \
     "${MYSQLDUMP_BINARY} -u${DATABASE_USER} -h${DATABASE_HOST} ${DATABASE_NAME} -p'${DATABASE_PASSWORD}' \
@@ -37,8 +39,6 @@ ssh ${SSH_USER}@${SSH_HOST} \
         --extended-insert \
         --default-character-set=utf8 \
         --set-charset \
-        | sed '/^\/\*\!50013/d' \
-        | sed 's/\/\*\!50017.*\*\///' \
         | gzip -9" > /var/dumps/dump.$(date +%s).${DATABASE_NAME}.sql.gz
 chown 1000 /var/dumps/dump.*
 exec "$@"

@@ -8,6 +8,6 @@ RUN yum update -y && \
 COPY entrypoint.sh /usr/local/bin/entrypoint
 RUN chmod a+x /usr/local/bin/entrypoint
 
-VOLUME ["/var/dumps/", "/root/.ssh/"]
+VOLUME ["/var/dumps/"]
 ENTRYPOINT ["/usr/local/bin/entrypoint"]
 CMD ["/bin/true"]
