@@ -10,9 +10,11 @@ SSH_USER=${SSH_USER:-root}
 
 LOCAL_USER_UID=${LOCAL_USER_UID:-0}
 LOCAL_USER=${LOCAL_USER:-root}
-useradd ${LOCAL_USER} -mu ${LOCAL_USER_UID}  > /dev/null 2>&1
-chown -R ${LOCAL_USER}.${LOCAL_USER} /home/${LOCAL_USER}
-gpasswd -a ${LOCAL_USER} superuser
+if [ "${LOCAL_USER}" != "root" ]; then
+    useradd ${LOCAL_USER} -mu ${LOCAL_USER_UID}  > /dev/null 2>&1
+    chown -R ${LOCAL_USER}.${LOCAL_USER} /home/${LOCAL_USER}
+    gpasswd -a ${LOCAL_USER} superuser
+fi
 
 if [[ -z ${DATABASE_HOST} ]] || [[ -z ${DATABASE_NAME} ]] || [[ -z ${DATABASE_USER} ]] || [[ -z ${DATABASE_PASSWORD} ]]; then
   echo "ERROR: "
