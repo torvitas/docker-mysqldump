@@ -7,6 +7,7 @@ DATABASE_PASSWORD=${DATABASE_PASSWORD:-}
 MYSQLDUMP_BINARY=${MYSQLDUMP_BINARY:-mysqldump}
 SSH_HOST=${SSH_HOST:-}
 SSH_USER=${SSH_USER:-root}
+SSH_FLAGS=${SSH_FLAGS:-}
 
 LOCAL_USER_UID=${LOCAL_USER_UID:-0}
 LOCAL_USER=${LOCAL_USER:-root}
@@ -31,16 +32,16 @@ if [[ -z ${SSH_USER} ]] || [[ -z ${SSH_HOST} ]]; then
 fi
 if [ ! -f /home/${LOCAL_USER}/.ssh/id_rsa ]; then
   mkdir -p /home/${LOCAL_USER}/.ssh
-  chmod 600 -R /home/${LOCAL_USER}/.ssh
+  chmod 700 -R /home/${LOCAL_USER}/.ssh
   ssh-keygen -b 2048 -t rsa -f /home/${LOCAL_USER}/.ssh/id_rsa -q -N ""
   ssh-keyscan -H ${SSH_HOST} >> /home/${LOCAL_USER}/.ssh/known_hosts
   ssh-copy-id ${SSH_USER}@${SSH_HOST}
 fi
 
-chmod 600 -R /home/${LOCAL_USER}/.ssh
+chmod 700 -R /home/${LOCAL_USER}/.ssh
 chown ${LOCAL_USER}.${LOCAL_USER} -R /home/${LOCAL_USER}/.ssh
 
-HOME="/home/${LOCAL_USER}" sudo -u ${LOCAL_USER} -E -- ssh ${SSH_USER}@${SSH_HOST} \
+HOME="/home/${LOCAL_USER}" sudo -u ${LOCAL_USER} -i -- ssh ${SSH_FLAGS} ${SSH_USER}@${SSH_HOST} \
     "${MYSQLDUMP_BINARY} -u${DATABASE_USER} -h${DATABASE_HOST} ${DATABASE_NAME} -p'${DATABASE_PASSWORD}' \
         --skip-opt \
         --add-drop-table \
